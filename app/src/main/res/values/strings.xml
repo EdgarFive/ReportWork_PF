@@ -1,4 +1,21 @@
 <resources>
     <string name="app_name">ReportWork</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="salir">Salir</string>
+    <string name="atras">Atras</string>
+
+    <string name="crear_reporte">Crear Nuevo Reporte</string>
+    <string name="ver_reportes">Ver Reportes</string>
+
+
+
+    <string name="tomar_foto">Tomar La Foto</string>
+    <string name="descripcion">Descripción</string>
+    <string name="guardar">Guardar</string>
+
+
+
+    <string name="ver_reporte">Ver Reportes</string>
+
 
 </resources>

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,29 +11,47 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ReportWork"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_crear_reporte"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.022" />
+        app:layout_constraintVertical_bias="0.1" />
 
     <Button
         android:id="@+id/btn_crear_reporte"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Crear Nuevo Reporte"
-        tools:layout_editor_absoluteX="115dp"
-        tools:layout_editor_absoluteY="154dp" />
+        android:text="@string/crear_reporte"
+        app:layout_constraintTop_toBottomOf="@id/textView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_ver_reporte"
+        android:layout_marginTop="16dp" />
 
     <Button
         android:id="@+id/btn_ver_reporte"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ver Reportes"
-        tools:layout_editor_absoluteX="140dp"
-        tools:layout_editor_absoluteY="294dp" />
+        android:text="@string/ver_reportes"
+        app:layout_constraintTop_toBottomOf="@id/btn_crear_reporte"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnatras"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_margin="16dp"
+        android:text="@string/salir"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
