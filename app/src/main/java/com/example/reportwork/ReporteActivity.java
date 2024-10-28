@@ -50,6 +50,7 @@ public class ReporteActivity extends AppCompatActivity {
 
         findViewById(R.id.btnatras).setOnClickListener(v -> finish()); //Para cancelar el reporte. =============================
 
+        //Boton para tomar la fotolonga =====================================================
         findViewById(R.id.btn_tomar_foto).setOnClickListener(v -> tomar_foto());
         btn_guardar_reporte.setOnClickListener(v -> guardar_reporte());
 
@@ -62,13 +63,20 @@ public class ReporteActivity extends AppCompatActivity {
 
     }
 
+    //Función para tomar la fotico =============================================================
     private void tomar_foto() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, RECUEST_CAPTURA_DE_IMAGEN);
+        //Pedimos el permiso en tiempo real =================
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, RECUEST_CAPTURA_DE_IMAGEN);
+        } else {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, RECUEST_CAPTURA_DE_IMAGEN);
+            }
         }
     }
 
+    //Funcion para poder guardar el reporte ======================================================0
     private void guardar_reporte() {
         String description = txted_descripcion_repositorio.getText().toString();
 
@@ -91,12 +99,37 @@ public class ReporteActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == RECUEST_PERMISO_LOCALIZACION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getLocation();
-            } else {
-                Toast.makeText(this, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
-            }
+
+        switch (requestCode){
+            case RECUEST_CAPTURA_DE_IMAGEN: //Permisos para la camara ===============================================================================
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    tomar_foto(); // Vuelve a intentar tomar la foto si se concede el permiso
+                } else {
+                    Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            case RECUEST_PERMISO_LOCALIZACION: //Permisos para la Localización ========================================================================
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation(); // Llama al método para obtener la ubicación si el permiso fue concedido
+                } else {
+                    Toast.makeText(this, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
+                }
+                break;
+
+            default:
+                break;
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RECUEST_CAPTURA_DE_IMAGEN && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            imagen_bitmap = (Bitmap) extras.get("data");
+            ima_imagen.setImageBitmap(imagen_bitmap); // Muestra la imagen en el ImageView
+        }
+    }
+
 }

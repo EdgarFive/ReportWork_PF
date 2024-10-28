@@ -44,4 +44,8 @@ dependencies {
     implementation(libs.gms.maps)       // Agregando Google Maps
     implementation(libs.gms.location)   // Agregando Google Location
 
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("androidx.fragment:fragment:1.4.1")
+
+
 }

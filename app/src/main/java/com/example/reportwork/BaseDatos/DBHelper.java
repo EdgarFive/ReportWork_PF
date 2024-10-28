@@ -6,13 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import android.database.Cursor;
+import android.util.Log;
 
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME  = "Reportes.db";
+    private static final String DATABASE_NAME  = "reportes.db";
     private static final int DATABASE_VERSION = 1;
-    public static final String TABLA_REPORTES = "t_reportes";
 
     // Nombre de la tabla y columnas
     private static final String TABLE_NAME = "reportes";
@@ -66,7 +66,16 @@ public class DBHelper extends SQLiteOpenHelper {
     // Método para obtener todos los reportes =============
     public Cursor getAllReports() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+
+        // Agrega un log para verificar el número de filas obtenidas
+        if (cursor != null) {
+            Log.d("DBHelper", "Número de filas obtenidas: " + cursor.getCount());
+        } else {
+            Log.e("DBHelper", "El cursor es nulo, no se encontraron reportes");
+        }
+
+        return cursor;
     }
 
     // Método para obtener un reporte por ID
@@ -74,5 +83,33 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID + " = ?", new String[]{String.valueOf(id)});
     }
+
+
+    // Métodos getter para las columnas
+    public String getColumnId() {
+        return COL_ID;
+    }
+
+    public String getColumnImagen() {
+        return COL_IMAGEN;
+    }
+
+    public String getColumnLatitud() {
+        return COL_LATITUD;
+    }
+
+    public String getColumnLongitud() {
+        return COL_LONGITUD;
+    }
+
+    public String getColumnDescripcion() {
+        return COL_DESCRIPCION;
+    }
+
+    public String getColumnDate() {
+        return COL_DATE;
+    }
+
+
 
 }
