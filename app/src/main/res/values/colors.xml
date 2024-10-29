@@ -2,4 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#FF9800</color> <!-- Naranja -->
+    <color name="colorPrimaryDark">#F57C00</color> <!-- Naranja oscuro -->
+    <color name="colorAccent">#FFC107</color> <!-- Amarillo -->
 </resources>

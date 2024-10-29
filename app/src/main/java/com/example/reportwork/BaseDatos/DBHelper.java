@@ -34,7 +34,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_NAME + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL_IMAGEN + " BLOB, " +
+                COL_IMAGEN + " TEXT, " +
                 COL_LATITUD + " REAL, " +
                 COL_LONGITUD + " REAL, " +
                 COL_DESCRIPCION + " TEXT, " +
@@ -51,7 +51,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Ingresar nuevo reporte ========================
-    public boolean insertReport(byte[] imagen, double latitud, double longitud, String descripcion) {
+    public boolean insertReport(String imagenPath, double latitud, double longitud, String descripcion) {
         // Verifica que las coordenadas no sean 0.0
         if (latitud == 0.0 || longitud == 0.0) {
             return false;
@@ -59,7 +59,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(COL_IMAGEN, imagen);
+        values.put(COL_IMAGEN, imagenPath);
         values.put(COL_LATITUD, latitud);
         values.put(COL_LONGITUD, longitud);
         values.put(COL_DESCRIPCION, descripcion);
@@ -81,6 +81,14 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID + " = ?", new String[]{String.valueOf(id)});
     }
+
+    // Método para eliminar un reporte por ID
+    public boolean deleteReport(int reportId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.delete(TABLE_NAME, COL_ID + " = ?", new String[]{String.valueOf(reportId)});
+        return result > 0;
+    }
+
 
     // Métodos getter para las columnas
     public String getColumnId() {

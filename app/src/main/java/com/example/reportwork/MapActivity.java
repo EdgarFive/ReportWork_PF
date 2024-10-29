@@ -21,20 +21,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
-//Importes nuevos===
-
-
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap eeMap;
     private DBHelper dbHelper;
     private int reporteId;
     private double latitud, longitud;
-    private String descripcion;
-    private byte[] imagenBytes;
+    private String descripcion, fecha;
 
-    private TextView tvDescription;
+    private TextView tvDescription, tvFecha;
     private ImageView imgReport;
     private Button btnBack;
 
@@ -55,6 +50,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         tvDescription = findViewById(R.id.tvDescription);
         imgReport = findViewById(R.id.imgReport);
         btnBack = findViewById(R.id.btnBack);
+        tvFecha = findViewById(R.id.tvFecha);
 
         // Obtener los detalles del reporte ===============================================
         loadReportDetails();
@@ -72,38 +68,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void loadReportDetails() {
         Cursor cursor = dbHelper.getReportById(reporteId);
-        if (cursor != null && cursor.moveToFirst()) {
-
-                // Asegurarse de que las columnas existen en el cursor
-                int COL_LATITUD = cursor.getColumnIndex(dbHelper.getColumnLatitud());
-                int COL_LONGITUD = cursor.getColumnIndex(dbHelper.getColumnLongitud());
-                int COL_DESCRIPCION = cursor.getColumnIndex(dbHelper.getColumnDescripcion());
-                int COL_IMAGEN = cursor.getColumnIndex(dbHelper.getColumnImagen());
-
-                // Verificación de las columnas
-                if (COL_LATITUD != -1) latitud = cursor.getDouble(COL_LATITUD);
-                if (COL_LONGITUD != -1) longitud = cursor.getDouble(COL_LONGITUD);
-                if (COL_DESCRIPCION != -1) descripcion = cursor.getString(COL_DESCRIPCION);
-                if (COL_IMAGEN != -1) imagenBytes = cursor.getBlob(COL_IMAGEN);
-
-                // Verifica las coordenadas ================================================================
-                if (latitud == 0.0 || longitud == 0.0) {
-                    Toast.makeText(this, "Coordenadas no válidas obtenidas", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Muestra las coordenadas obtenidas en el mapa
-                    tvDescription.setText(descripcion);
-                    if (imagenBytes != null) {
-                        Bitmap imageBitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
-                        imgReport.setImageBitmap(imageBitmap);
-                    }
-                }
-
-        } else {
-            Toast.makeText(this, "Error al acceder a la base de datos", Toast.LENGTH_SHORT).show();
-        }
-
         if (cursor != null) {
-            cursor.close();
+            try{
+                if (cursor.moveToFirst()) {
+                    int COL_LATITUD = cursor.getColumnIndex(dbHelper.getColumnLatitud());
+                    int COL_LONGITUD = cursor.getColumnIndex(dbHelper.getColumnLongitud());
+                    int COL_DESCRIPCION = cursor.getColumnIndex(dbHelper.getColumnDescripcion());
+                    int COL_IMAGEN = cursor.getColumnIndex(dbHelper.getColumnImagen());
+                    int COL_FECHA = cursor.getColumnIndex(dbHelper.getColumnDate()); // Nueva columna de fecha
+
+
+                    if (COL_LATITUD != -1 && COL_LONGITUD != -1 && COL_DESCRIPCION != -1) {
+                        latitud = cursor.getDouble(COL_LATITUD);
+                        longitud = cursor.getDouble(COL_LONGITUD);
+                        descripcion = cursor.getString(COL_DESCRIPCION);
+                        fecha = cursor.getString(COL_FECHA); // Obtener la fecha
+
+
+                        // Mostrar la descripción
+                        tvDescription.setText(descripcion);
+                        tvFecha.setText("Fecha: " + fecha); // Mostrar la fecha
+
+                        // Mostrar la imagen
+                        if (COL_IMAGEN != -1) {
+                            String rutaImagen = cursor.getString(COL_IMAGEN);
+                            if (rutaImagen != null) {
+                                imgReport.setImageBitmap(BitmapFactory.decodeFile(rutaImagen));
+                            } else {
+                                Toast.makeText(this, "No se encontró la imagen del reporte", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this, "Error al acceder a los datos del reporte", Toast.LENGTH_SHORT).show();
+                    }
+                }else {
+                    Toast.makeText(this, "No se encontró el reporte", Toast.LENGTH_SHORT).show();
+                }
+            }finally{
+                cursor.close();
+            }
+        }else{
+            Toast.makeText(this, "Error al acceder a la base de datos", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -120,6 +125,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         } else {
             Toast.makeText(this, "Coordenadas no válidas", Toast.LENGTH_SHORT).show();
         }
-
     }
 }

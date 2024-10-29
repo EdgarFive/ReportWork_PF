@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.reportwork.BaseDatos.DBHelper;
@@ -21,6 +22,7 @@ public class VerReporteActivity extends AppCompatActivity {
 
     private ListView lw_lista_reportes;
     private ArrayList<String> lista_reportes_array;
+    private ArrayList<Integer> lista_reportes_ids;
     private ArrayAdapter<String> adapter;
     private DBHelper dbHelper;
     private Button btnAtras;
@@ -33,6 +35,7 @@ public class VerReporteActivity extends AppCompatActivity {
         lw_lista_reportes = findViewById(R.id.lw_lista_reportes);
         dbHelper = new DBHelper(this);
         lista_reportes_array = new ArrayList<>();
+        lista_reportes_ids = new ArrayList<>();
 
         // Cargar los reportes desde la base de datos
         loadReports();
@@ -60,6 +63,14 @@ public class VerReporteActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error al obtener el reporte", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Al mantener presionado un elemento, mostrar el menú para eliminar
+        lw_lista_reportes.setOnItemLongClickListener((parent, view, position, id) -> {
+            int reportId = lista_reportes_ids.get(position);
+            showDeleteConfirmationDialog(reportId, position);
+            return true;
+        });
+
     }
 
     private void loadReports() {
@@ -68,9 +79,14 @@ public class VerReporteActivity extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 do {
                     int colDescripcion = cursor.getColumnIndex(dbHelper.getColumnDescripcion());
-                    if (colDescripcion != -1) {
+                    int colId = cursor.getColumnIndex(dbHelper.getColumnId());
+
+                    if (colDescripcion != -1 && colId != -1) {
                         String description = cursor.getString(colDescripcion);
+                        int reportId = cursor.getInt(colId);
+
                         lista_reportes_array.add(description);
+                        lista_reportes_ids.add(reportId);
                     }
                 } while (cursor.moveToNext());
             } else {
@@ -85,4 +101,29 @@ public class VerReporteActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, lista_reportes_array);
         lw_lista_reportes.setAdapter(adapter);
     }
+
+
+    // Mostrar un diálogo de confirmación para eliminar un reporte
+    private void showDeleteConfirmationDialog(int reportId, int position) {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar Reporte")
+                .setMessage("¿Estás seguro de que quieres eliminar este reporte?")
+                .setPositiveButton("Sí", (dialog, which) -> deleteReport(reportId, position))
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    // Eliminar el reporte de la base de datos y de la lista
+    private void deleteReport(int reportId, int position) {
+        boolean isDeleted = dbHelper.deleteReport(reportId);
+        if (isDeleted) {
+            lista_reportes_array.remove(position);
+            lista_reportes_ids.remove(position);
+            adapter.notifyDataSetChanged();
+            Toast.makeText(this, "Reporte eliminado", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Error al eliminar el reporte", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
