@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,6 +23,7 @@ public class VerReporteActivity extends AppCompatActivity {
     private ArrayList<String> lista_reportes_array;
     private ArrayAdapter<String> adapter;
     private DBHelper dbHelper;
+    private Button btnAtras;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,9 @@ public class VerReporteActivity extends AppCompatActivity {
         // Cargar los reportes desde la base de datos
         loadReports();
 
+        // Manejar el clic en el botón "Atrás"
+        findViewById(R.id.btnatras).setOnClickListener(v -> finish());
+
         // Al hacer clic en un reporte, abrir la vista de mapa
         lw_lista_reportes.setOnItemClickListener((parent, view, position, id) -> {
             Cursor cursor = dbHelper.getAllReports();
@@ -43,13 +48,11 @@ public class VerReporteActivity extends AppCompatActivity {
                 int colId = cursor.getColumnIndex(dbHelper.getColumnId());
                 if (colId != -1) {
                     int reportId = cursor.getInt(colId);
-                    Log.d("VerReporteActivity", "ID de reporte seleccionado: " + reportId);
 
                     Intent intent = new Intent(VerReporteActivity.this, MapActivity.class);
                     intent.putExtra("REPORT_ID", reportId);
                     startActivity(intent);
                 } else {
-                    Log.e("VerReporteActivity", "No se encontró la columna ID en el cursor");
                     Toast.makeText(this, "Error al obtener el ID del reporte", Toast.LENGTH_SHORT).show();
                 }
                 cursor.close(); // Cierra el cursor después de su uso
@@ -59,13 +62,9 @@ public class VerReporteActivity extends AppCompatActivity {
         });
     }
 
-
-
     private void loadReports() {
         Cursor cursor = dbHelper.getAllReports();
         if (cursor != null) {
-            Log.d("VerReporteActivity", "Número de filas en el cursor: " + cursor.getCount());
-
             if (cursor.moveToFirst()) {
                 do {
                     int colDescripcion = cursor.getColumnIndex(dbHelper.getColumnDescripcion());
@@ -75,18 +74,15 @@ public class VerReporteActivity extends AppCompatActivity {
                     }
                 } while (cursor.moveToNext());
             } else {
-                Log.d("VerReporteActivity", "El cursor no tiene filas");
                 Toast.makeText(this, "No hay reportes disponibles", Toast.LENGTH_SHORT).show();
             }
-
             cursor.close(); // Cierra el cursor después de su uso
         } else {
-            Log.e("VerReporteActivity", "El cursor es nulo");
+            Toast.makeText(this, "El cursos es nulo", Toast.LENGTH_SHORT).show();
         }
 
         // Configura el adaptador del ListView
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, lista_reportes_array);
         lw_lista_reportes.setAdapter(adapter);
     }
-
 }

@@ -52,6 +52,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // Ingresar nuevo reporte ========================
     public boolean insertReport(byte[] imagen, double latitud, double longitud, String descripcion) {
+        // Verifica que las coordenadas no sean 0.0
+        if (latitud == 0.0 || longitud == 0.0) {
+            return false;
+        }
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COL_IMAGEN, imagen);
@@ -68,13 +73,6 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
 
-        // Agrega un log para verificar el número de filas obtenidas
-        if (cursor != null) {
-            Log.d("DBHelper", "Número de filas obtenidas: " + cursor.getCount());
-        } else {
-            Log.e("DBHelper", "El cursor es nulo, no se encontraron reportes");
-        }
-
         return cursor;
     }
 
@@ -83,7 +81,6 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID + " = ?", new String[]{String.valueOf(id)});
     }
-
 
     // Métodos getter para las columnas
     public String getColumnId() {
@@ -109,7 +106,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public String getColumnDate() {
         return COL_DATE;
     }
-
 
 
 }

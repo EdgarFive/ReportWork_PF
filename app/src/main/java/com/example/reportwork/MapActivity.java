@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,6 +20,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+
+//Importes nuevos===
+
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -51,23 +56,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         imgReport = findViewById(R.id.imgReport);
         btnBack = findViewById(R.id.btnBack);
 
-        // Obtener los detalles del reporte
+        // Obtener los detalles del reporte ===============================================
         loadReportDetails();
 
-        // Configurar el mapa
+
+        // Configurar el mapa =====================================================================
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
 
-        // Configurar el evento del botón "Atrás"
+        // Botón "Atrás" ======================================================================
         btnBack.setOnClickListener(v -> finish());
     }
 
     private void loadReportDetails() {
         Cursor cursor = dbHelper.getReportById(reporteId);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
+
                 // Asegurarse de que las columnas existen en el cursor
                 int COL_LATITUD = cursor.getColumnIndex(dbHelper.getColumnLatitud());
                 int COL_LONGITUD = cursor.getColumnIndex(dbHelper.getColumnLongitud());
@@ -80,22 +86,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 if (COL_DESCRIPCION != -1) descripcion = cursor.getString(COL_DESCRIPCION);
                 if (COL_IMAGEN != -1) imagenBytes = cursor.getBlob(COL_IMAGEN);
 
-                // Mostrar descripción
-                tvDescription.setText(descripcion);
-
-                // Convertir bytes a Bitmap y mostrar imagen
-                if (imagenBytes != null) {
-                    Bitmap imageBitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
-                    imgReport.setImageBitmap(imageBitmap);
+                // Verifica las coordenadas ================================================================
+                if (latitud == 0.0 || longitud == 0.0) {
+                    Toast.makeText(this, "Coordenadas no válidas obtenidas", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(this, "No se encontró la imagen del reporte", Toast.LENGTH_SHORT).show();
+                    // Muestra las coordenadas obtenidas en el mapa
+                    tvDescription.setText(descripcion);
+                    if (imagenBytes != null) {
+                        Bitmap imageBitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
+                        imgReport.setImageBitmap(imageBitmap);
+                    }
                 }
-            } else {
-                Toast.makeText(this, "No se encontró el reporte", Toast.LENGTH_SHORT).show();
-            }
-            cursor.close(); // Cerrar el cursor después de su uso
+
         } else {
             Toast.makeText(this, "Error al acceder a la base de datos", Toast.LENGTH_SHORT).show();
+        }
+
+        if (cursor != null) {
+            cursor.close();
         }
     }
 
@@ -103,9 +111,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         eeMap = googleMap;
 
-        // Mostrar la ubicación en el mapa
-        LatLng reportLocation = new LatLng(latitud, longitud);
-        eeMap.addMarker(new MarkerOptions().position(reportLocation).title("Reporte"));
-        eeMap.moveCamera(CameraUpdateFactory.newLatLngZoom(reportLocation, 15));
+        // Verificar si las coordenadas son válidas ================================================================
+        if (latitud != 0.0 && longitud != 0.0) {
+            // Mostrar la ubicación en el mapa
+            LatLng reportLocation = new LatLng(latitud, longitud);
+            eeMap.addMarker(new MarkerOptions().position(reportLocation).title("Reporte"));
+            eeMap.moveCamera(CameraUpdateFactory.newLatLngZoom(reportLocation, 15));
+        } else {
+            Toast.makeText(this, "Coordenadas no válidas", Toast.LENGTH_SHORT).show();
+        }
+
     }
 }
