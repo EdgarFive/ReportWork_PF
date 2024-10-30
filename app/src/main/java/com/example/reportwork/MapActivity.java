@@ -66,6 +66,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         btnBack.setOnClickListener(v -> finish());
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        eeMap = googleMap;
+
+        // Verificar si las coordenadas son válidas ================================================================
+        if (latitud != 0.0 && longitud != 0.0) {
+            // Mostrar la ubicación en el mapa
+            LatLng reportLocation = new LatLng(latitud, longitud);
+            eeMap.addMarker(new MarkerOptions().position(reportLocation).title("Reporte"));
+            eeMap.moveCamera(CameraUpdateFactory.newLatLngZoom(reportLocation, 15));
+        } else {
+            Toast.makeText(this, "Coordenadas no válidas", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void loadReportDetails() {
         Cursor cursor = dbHelper.getReportById(reporteId);
         if (cursor != null) {
@@ -109,21 +124,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         }else{
             Toast.makeText(this, "Error al acceder a la base de datos", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        eeMap = googleMap;
-
-        // Verificar si las coordenadas son válidas ================================================================
-        if (latitud != 0.0 && longitud != 0.0) {
-            // Mostrar la ubicación en el mapa
-            LatLng reportLocation = new LatLng(latitud, longitud);
-            eeMap.addMarker(new MarkerOptions().position(reportLocation).title("Reporte"));
-            eeMap.moveCamera(CameraUpdateFactory.newLatLngZoom(reportLocation, 15));
-        } else {
-            Toast.makeText(this, "Coordenadas no válidas", Toast.LENGTH_SHORT).show();
         }
     }
 }

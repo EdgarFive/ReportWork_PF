@@ -113,7 +113,7 @@ public class ReporteActivity extends AppCompatActivity {
         //Obtener la ultima ubicación conocida ==================================================================================================================================================
         fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
             @Override
-            public void onSuccess(Location location) {
+            public void onSuccess(Location location) { //guarda las coordenadas en las variables =====================================================================================================================
                 if (location != null) {
                     latitud = location.getLatitude();
                     longitud = location.getLongitude();
@@ -130,9 +130,9 @@ public class ReporteActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, RECUEST_CAPTURA_DE_IMAGEN);
         } else {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //inten para capturar imagen y dice que se debe abrir la camara ==================================================================
 
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) { //verificar si la camara existe=================================================================================================================
                 File photoFile = null;
                 try {
                     photoFile = crearArchivoImagen();

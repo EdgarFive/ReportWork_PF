@@ -73,6 +73,7 @@ public class VerReporteActivity extends AppCompatActivity {
 
     }
 
+    //Leer todos los reportes de la base de datos y agregarlos a la lista
     private void loadReports() {
         Cursor cursor = dbHelper.getAllReports();
         if (cursor != null) {
